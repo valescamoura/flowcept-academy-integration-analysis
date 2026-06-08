@@ -1,0 +1,21 @@
+---
+config:
+  theme: redux-color
+  look: handDrawn
+  fontFamily: '''Recursive Variable'', sans-serif'
+  themeVariables:
+    fontFamily: '''Recursive Variable'', sans-serif'
+  layout: dagre
+---
+sequenceDiagram
+    participant App as Application
+    participant Wrap as Wrapper (Patched)
+    participant Acad as Academy (Original)
+    participant Flow as Flowcept Core
+
+    App->>Wrap: call method()
+    Wrap->>Flow: start trace / pre-processing
+    Wrap->>Acad: invoke original method()
+    Acad-->>Wrap: return result
+    Wrap->>Flow: post-processing / send metadata
+    Wrap-->>App: return result

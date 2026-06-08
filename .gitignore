@@ -216,3 +216,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Experiment outputs
+experiments/results/*
+!experiments/results/.gitkeep
+
+# use cases
+*/*/src/runinfo
+approaches/dynamic_runtime_instrumentation/src/academy_plugin_perf.csv
+
+# test
+flowcept_test/

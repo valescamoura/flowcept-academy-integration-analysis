@@ -1,0 +1,21 @@
+%% flowchart TD
+%%     A[Academy Runtime]
+
+%%     A -->|structured log records| B[Flowcept Logging Handler]
+
+%%     B -->|provenance objects| C[Flowcept Provenance Store]
+
+%%     style B fill:#f5f5f5,stroke:#333,stroke-width:3px
+
+flowchart TD
+
+    A[Academy Runtime]
+
+    subgraph Flowcept Integration Layer
+        B[Logging Handler]
+    end
+
+    C[Provenance Store]
+
+    A -->|log records| B
+    B -->|provenance objects| C

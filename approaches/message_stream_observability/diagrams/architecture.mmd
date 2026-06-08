@@ -1,0 +1,21 @@
+flowchart TD
+    A[Distributed Academy Agents]
+
+    subgraph Academy Messaging Infrastructure
+        B[Redis Exchange]
+        C[Mailboxes]
+    end
+
+    A -->|request/response messages| B
+    B --> C
+
+    C -->|Option 1: Flowcept-compatible events| F["Flowcept Hub (redis)"]
+
+    C -->|Option 2: Academy-native messages| D[Academy-Redis Adapter]
+    D -->|Flowcept-compatible events| F
+
+    F --> G[Provenance Processing]
+    G --> H[Provenance Store]
+
+    style D fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style F fill:#eef5ff,stroke:#3366cc,stroke-width:2px

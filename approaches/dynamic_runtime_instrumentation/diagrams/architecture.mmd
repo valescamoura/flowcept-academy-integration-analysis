@@ -1,0 +1,20 @@
+---
+config:
+  theme: redux
+  look: neo
+  fontFamily: '''Recursive Variable'', sans-serif'
+  themeVariables:
+    fontFamily: '''Recursive Variable'', sans-serif'
+  layout: dagre
+---
+flowchart TB
+
+subgraph AFTER["After Instrumentation"]
+    A2[Application] --> W["Patched Wrapper Layer<br/>(Flowcept Plugin)"]
+    W --> B2["Academy Framework<br/>(Original Logic)"]
+    W --> C["Flowcept Core<br/>(Tracing / Observability)"]
+end
+
+subgraph BEFORE["Before Instrumentation"]
+    A[Application] --> B[Academy Framework]
+end

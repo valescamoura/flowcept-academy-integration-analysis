@@ -1,0 +1,179 @@
+defaults:
+  runs: 30
+  timeout_seconds: 300
+  python: ".venv/bin/python"
+  mongo:
+    host: "localhost"
+    port: 27017
+    timeout_ms: 3000
+    socket_timeout_ms: 10000
+  flowcept:
+    telemetry_capture:
+      cpu: true
+      per_cpu: true
+      process_info: true
+      mem: true
+      disk: true
+      network: true
+      machine_info: true
+      gpu: null
+
+approaches:
+  baseline:
+    enabled: false
+    description: "Academy Fibonacci workflow without Flowcept instrumentation."
+    cwd: "approaches/baseline/src"
+    python: "../.venv/bin/python"
+    command: ["{python}", "fibiterate7.py"]
+    uses_flowcept: false
+    mongo_db: "flowcept_baseline"
+    env:
+      PYTHONPATH: "/Users/valesca/Documents/projects/valescamoura/flowcept/src{pathsep}{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}"
+      # Avoids macOS Objective-C fork-safety crashes when Parsl spawns Python workers.
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../.venv"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+
+  event_log_observability:
+    enabled: true
+    description: "Academy structured log events translated into Flowcept tasks."
+    cwd: "approaches/event_log_observability/src"
+    python: "../.venv/bin/python"
+    command: ["{python}", "fibiterate7.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_event_log_observability"
+    flowcept:
+      telemetry_capture:
+        cpu: true
+        per_cpu: true
+        process_info: true
+        mem: true
+        disk: true
+        network: true
+        machine_info: true
+        gpu: null
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}"
+      # Avoids macOS Objective-C fork-safety crashes when Parsl spawns Python workers.
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../.venv"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept==0.10.4"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept[extras]"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/valescamoura/academy-flowcept"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+
+  direct_code_instrumentation:
+    enabled: true
+    description: "Flowcept decorators/API calls embedded in the Academy workflow."
+    cwd: "approaches/direct_code_instrumentation/src"
+    python: "../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_direct_code_instrumentation"
+    flowcept:
+      telemetry_capture:
+        cpu: true
+        per_cpu: true
+        process_info: true
+        mem: true
+        disk: true
+        network: true
+        machine_info: true
+        gpu: null
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}{pathsep}{approach_cwd}{pathsep}{approach_venv_site_packages}"
+      # Avoids macOS Objective-C fork-safety crashes when Parsl spawns Python workers.
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../.venv"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept==0.10.4"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept[extras]"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+
+  dynamic_runtime_instrumentation:
+    enabled: true
+    description: "Runtime monkey-patching/plugin instrumentation of Academy."
+    cwd: "approaches/dynamic_runtime_instrumentation/src"
+    python: "../.venv/bin/python"
+    command: ["{python}", "fibiterate7.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_dynamic_runtime_instrumentation"
+    flowcept:
+      telemetry_capture:
+        cpu: true
+        per_cpu: true
+        process_info: true
+        mem: true
+        disk: true
+        network: true
+        machine_info: true
+        gpu: null
+      plugins:
+        academy:
+          enabled: true
+          kind: academy
+          workflow_name: "academy_fibonacci_dynamic_runtime_instrumentation"
+          performance_tracking: true
+          perf_csv: "academy_plugin_perf.csv"
+    env:
+      PYTHONPATH: "/Users/valesca/Documents/projects/GueroudjiAmal-flowcept-agentic/src{pathsep}{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}{pathsep}{approach_cwd}{pathsep}{approach_venv_site_packages}"
+      # Avoids macOS Objective-C fork-safety crashes when Parsl spawns Python workers.
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../.venv"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "-e", "/Users/valesca/Documents/projects/GueroudjiAmal-flowcept-agentic[extras]"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+
+  academy_native_provenance_generation:
+    enabled: true
+    description: "Academy emits/manages Flowcept provenance internally."
+    cwd: "approaches/academy_native_provenance_generation/src"
+    python: "../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_academy_native_provenance"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../.venv"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept[extras]"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "academy-py @ git+https://github.com/valescamoura/academy@flowcept_integration"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}"
+      # Avoids macOS Objective-C fork-safety crashes when Parsl spawns Python workers.
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+
+  message_stream_observability:
+    enabled: true
+    description: "External observation of Academy Redis/message stream."
+    cwd: "approaches/message_stream_observability/src"
+    python: "../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_message_stream_observability"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../.venv"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept[extras,academy] @ git+https://github.com/valescamoura/flowcept@academy_plugin"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}"
+      # Avoids macOS Objective-C fork-safety crashes when Parsl spawns Python workers.
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
