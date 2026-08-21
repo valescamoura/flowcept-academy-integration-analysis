@@ -231,3 +231,4 @@ approaches/dynamic_runtime_instrumentation/src/academy_plugin_perf.csv
 flowcept_test/
 *.DS_Store
 experiments_old
+experiments/resultspaper
