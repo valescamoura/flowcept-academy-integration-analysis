@@ -1,0 +1,12 @@
+approaches:
+  baseline: "Baseline"
+  event_log_observability: "Log Handler-based Observability"
+  direct_code_instrumentation: "Direct Application Instrumentation"
+  dynamic_runtime_instrumentation: "Dynamic Framework Instrumentation"
+  academy_native_provenance_generation: "Direct Framework Instrumentation"
+  message_stream_observability: "Message Stream Observability"
+  opentelemetry_integration: "Third-party Adapters"
+
+use_cases:
+  fibonacci: "Fibonacci"
+  perceptron_gridsearch: "Perceptron GridSearch"

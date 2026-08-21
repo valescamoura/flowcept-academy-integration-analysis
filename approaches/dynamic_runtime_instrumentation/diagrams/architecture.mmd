@@ -18,3 +18,17 @@ end
 subgraph BEFORE["Before Instrumentation"]
     A[Application] --> B[Academy Framework]
 end
+
+
+
+%% flowchart TB
+
+%% subgraph AFTER["After Instrumentation"]
+%%     A2[Application] --> W["Patched Wrapper Layer<br/>(Prov. Framework Plugin)"]
+%%     W --> B2["Agentic Framework<br/>(Original Logic)"]
+%%     W --> C["Provenance Framework Core<br/>(Tracing / Observability)"]
+%% end
+
+%% subgraph BEFORE["Before Instrumentation"]
+%%     A[Application] --> B[Agentic Framework]
+%% end

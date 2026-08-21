@@ -41,6 +41,35 @@ def load_approaches() -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     return cfg.get("defaults", {}), cfg.get("approaches", {})
 
 
+def load_approach_labels() -> dict[str, Any]:
+    path = CONFIG_DIR / "approach_labels.yaml"
+    if not path.exists():
+        return {"approaches": {}, "use_cases": {}}
+    return load_yaml(path)
+
+
+def split_approach_use_case(approach_name: str, labels: dict[str, Any] | None = None) -> tuple[str, str]:
+    labels = labels or load_approach_labels()
+    use_cases = labels.get("use_cases", {})
+    for use_case in sorted(use_cases, key=len, reverse=True):
+        suffix = f"_{use_case}"
+        if approach_name.endswith(suffix):
+            return approach_name[: -len(suffix)], use_case
+    return approach_name, "fibonacci"
+
+
+def approach_display_label(approach_name: str, labels: dict[str, Any] | None = None) -> str:
+    labels = labels or load_approach_labels()
+    approach_key, _ = split_approach_use_case(approach_name, labels)
+    return labels.get("approaches", {}).get(approach_key, approach_key)
+
+
+def use_case_display_label(approach_name: str, labels: dict[str, Any] | None = None) -> str:
+    labels = labels or load_approach_labels()
+    _, use_case = split_approach_use_case(approach_name, labels)
+    return labels.get("use_cases", {}).get(use_case, use_case)
+
+
 def selected_approaches(name: str) -> dict[str, dict[str, Any]]:
     _, approaches = load_approaches()
     if name == "all":
@@ -285,7 +314,12 @@ def write_json(path: Path, payload: Any) -> None:
 def copy_if_exists(src: Path, dst: Path) -> None:
     if src.exists():
         dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
+        if src.is_dir():
+            if dst.exists():
+                shutil.rmtree(dst)
+            shutil.copytree(src, dst)
+        else:
+            shutil.copy2(src, dst)
 
 
 def merged_env(

@@ -5,7 +5,7 @@ import sys
 
 
 def _ensure_project_on_pythonpath() -> None:
-    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
     current = os.environ.get("PYTHONPATH", "")
     paths = [p for p in current.split(os.pathsep) if p]
     if project_dir not in paths:

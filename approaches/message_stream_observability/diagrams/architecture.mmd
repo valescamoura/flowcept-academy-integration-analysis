@@ -19,3 +19,26 @@ flowchart TD
 
     style D fill:#f5f5f5,stroke:#333,stroke-width:2px
     style F fill:#eef5ff,stroke:#3366cc,stroke-width:2px
+
+
+
+
+
+%% flowchart TD
+
+%%     subgraph Agentic Framework
+%%         A[Agents]
+%%         B[Messaging Layer]
+%%         A -->|request/response messages| B
+%%     end
+
+%%     B --> C
+
+%%     subgraph Provenance Framework
+%%         C[Adapter]
+%%         D[Consumer]
+%%         C -->|Framework-Compatible Provenance Data| D
+%%         E[Database]
+%%         D --> E
+%%     end
+

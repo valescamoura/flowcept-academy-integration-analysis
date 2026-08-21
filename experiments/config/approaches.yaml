@@ -22,8 +22,8 @@ approaches:
   baseline:
     enabled: false
     description: "Academy Fibonacci workflow without Flowcept instrumentation."
-    cwd: "approaches/baseline/src"
-    python: "../.venv/bin/python"
+    cwd: "approaches/baseline/src/fibonacci"
+    python: "../../.venv/bin/python"
     command: ["{python}", "fibiterate7.py"]
     uses_flowcept: false
     mongo_db: "flowcept_baseline"
@@ -33,16 +33,38 @@ approaches:
       OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
     setup:
       commands:
-        - ["python3", "-m", "venv", "../.venv"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+
+  baseline_perceptron_gridsearch:
+    enabled: false
+    description: "Academy Perceptron GridSearch workflow without Flowcept instrumentation."
+    cwd: "approaches/baseline/src/perceptron_gridsearch"
+    python: "../../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: false
+    mongo_db: "flowcept_baseline_perceptron_gridsearch"
+    artifacts:
+      - "perceptron_gridsearch_summary.json"
+      - "artifacts"
+    env:
+      PYTHONPATH: "{repo_root}"
+      # Avoids macOS Objective-C fork-safety crashes when Parsl spawns Python workers.
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "numpy", "torch>=2.6.0"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
 
   event_log_observability:
     enabled: true
     description: "Academy structured log events translated into Flowcept tasks."
-    cwd: "approaches/event_log_observability/src"
-    python: "../.venv/bin/python"
+    cwd: "approaches/event_log_observability/src/fibonacci"
+    python: "../../.venv/bin/python"
     command: ["{python}", "fibiterate7.py"]
     uses_flowcept: true
     mongo_db: "flowcept_event_log_observability"
@@ -62,19 +84,51 @@ approaches:
       OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
     setup:
       commands:
-        - ["python3", "-m", "venv", "../.venv"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept==0.10.4"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept[extras]"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/valescamoura/academy-flowcept"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras] @ git+https://github.com/ORNL/flowcept@fc_ui"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/valescamoura/academy-flowcept"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+
+  event_log_observability_perceptron_gridsearch:
+    enabled: false
+    description: "Academy Perceptron GridSearch structured log events translated into Flowcept tasks."
+    cwd: "approaches/event_log_observability/src/perceptron_gridsearch"
+    python: "../../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_event_log_observability_perceptron_gridsearch"
+    flowcept:
+      telemetry_capture:
+        cpu: true
+        per_cpu: true
+        process_info: true
+        mem: true
+        disk: true
+        network: true
+        machine_info: true
+        gpu: null
+    artifacts:
+      - "perceptron_gridsearch_summary.json"
+      - "artifacts"
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}"
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras,webservice] @ git+https://github.com/ORNL/flowcept@fc_ui"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "numpy", "torch>=2.6.0"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/valescamoura/academy-flowcept"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
 
   direct_code_instrumentation:
     enabled: true
     description: "Flowcept decorators/API calls embedded in the Academy workflow."
-    cwd: "approaches/direct_code_instrumentation/src"
-    python: "../.venv/bin/python"
+    cwd: "approaches/direct_code_instrumentation/src/fibonacci"
+    python: "../../.venv/bin/python"
     command: ["{python}", "main.py"]
     uses_flowcept: true
     mongo_db: "flowcept_direct_code_instrumentation"
@@ -94,18 +148,49 @@ approaches:
       OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
     setup:
       commands:
-        - ["python3", "-m", "venv", "../.venv"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept==0.10.4"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept[extras]"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras] @ git+https://github.com/ORNL/flowcept@fc_ui"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+
+  direct_code_instrumentation_perceptron_gridsearch:
+    enabled: false
+    description: "Flowcept decorators/API calls embedded in the Academy Perceptron GridSearch workflow."
+    cwd: "approaches/direct_code_instrumentation/src/perceptron_gridsearch"
+    python: "../../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_direct_code_instrumentation_perceptron_gridsearch"
+    flowcept:
+      telemetry_capture:
+        cpu: true
+        per_cpu: true
+        process_info: true
+        mem: true
+        disk: true
+        network: true
+        machine_info: true
+        gpu: null
+    artifacts:
+      - "perceptron_gridsearch_summary.json"
+      - "artifacts"
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}{pathsep}{approach_cwd}{pathsep}{approach_venv_site_packages}"
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras,webservice] @ git+https://github.com/ORNL/flowcept@fc_ui"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "numpy", "torch>=2.6.0"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
 
   dynamic_runtime_instrumentation:
     enabled: true
     description: "Runtime monkey-patching/plugin instrumentation of Academy."
-    cwd: "approaches/dynamic_runtime_instrumentation/src"
-    python: "../.venv/bin/python"
+    cwd: "approaches/dynamic_runtime_instrumentation/src/fibonacci"
+    python: "../../.venv/bin/python"
     command: ["{python}", "fibiterate7.py"]
     uses_flowcept: true
     mongo_db: "flowcept_dynamic_runtime_instrumentation"
@@ -132,48 +217,194 @@ approaches:
       OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
     setup:
       commands:
-        - ["python3", "-m", "venv", "../.venv"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "-e", "/Users/valesca/Documents/projects/GueroudjiAmal-flowcept-agentic[extras]"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-e", "/Users/valesca/Documents/projects/GueroudjiAmal-flowcept-agentic[extras]"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+
+  dynamic_runtime_instrumentation_perceptron_gridsearch:
+    enabled: true
+    description: "Runtime monkey-patching/plugin instrumentation of Academy for Perceptron GridSearch."
+    cwd: "approaches/dynamic_runtime_instrumentation/src/perceptron_gridsearch"
+    python: "../../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_dynamic_runtime_instrumentation_perceptron_gridsearch"
+    collect_outputs:
+      - "perceptron_gridsearch_summary.json"
+    flowcept:
+      telemetry_capture:
+        cpu: true
+        per_cpu: true
+        process_info: true
+        mem: true
+        disk: true
+        network: true
+        machine_info: true
+        gpu: null
+      plugins:
+        academy:
+          enabled: true
+          kind: academy
+          workflow_name: "academy_perceptron_gridsearch_dynamic_runtime_instrumentation"
+          performance_tracking: true
+          perf_csv: "academy_plugin_perf.csv"
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}{pathsep}{approach_cwd}{pathsep}{approach_venv_site_packages}"
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras,webservice] @ git+https://github.com/GueroudjiAmal/flowcept@merge-fc-ui-into-agentic"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "numpy", "torch>=2.6.0"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
 
   academy_native_provenance_generation:
     enabled: true
     description: "Academy emits/manages Flowcept provenance internally."
-    cwd: "approaches/academy_native_provenance_generation/src"
-    python: "../.venv/bin/python"
+    cwd: "approaches/academy_native_provenance_generation/src/fibonacci"
+    python: "../../.venv/bin/python"
     command: ["{python}", "main.py"]
     uses_flowcept: true
     mongo_db: "flowcept_academy_native_provenance"
     setup:
       commands:
-        - ["python3", "-m", "venv", "../.venv"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept[extras]"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "academy-py @ git+https://github.com/valescamoura/academy@flowcept_integration"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras] @ git+https://github.com/ORNL/flowcept@fc_ui"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "academy-py @ git+https://github.com/valescamoura/academy@flowcept_integration"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
     env:
       PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}"
       # Avoids macOS Objective-C fork-safety crashes when Parsl spawns Python workers.
       OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
 
+  academy_native_provenance_generation_perceptron_gridsearch:
+    enabled: false
+    description: "Academy Perceptron GridSearch where Academy emits/manages Flowcept provenance internally."
+    cwd: "approaches/academy_native_provenance_generation/src/perceptron_gridsearch"
+    python: "../../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_academy_native_perceptron_gridsearch"
+    artifacts:
+      - "perceptron_gridsearch_summary.json"
+      - "artifacts"
+    flowcept:
+      telemetry_capture:
+        cpu: true
+        per_cpu: true
+        process_info: true
+        mem: true
+        disk: true
+        network: true
+        machine_info: true
+        gpu: null
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}{pathsep}{approach_cwd}{pathsep}{approach_venv_site_packages}"
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+      ACADEMY_FLOWCEPT_ENABLED: "1"
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras,webservice] @ git+https://github.com/ORNL/flowcept@fc_ui"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "numpy", "torch>=2.6.0"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "academy-py @ git+https://github.com/valescamoura/academy@flowcept_integration"]
+
   message_stream_observability:
     enabled: true
     description: "External observation of Academy Redis/message stream."
-    cwd: "approaches/message_stream_observability/src"
-    python: "../.venv/bin/python"
+    cwd: "approaches/message_stream_observability/src/fibonacci"
+    python: "../../.venv/bin/python"
     command: ["{python}", "main.py"]
     uses_flowcept: true
     mongo_db: "flowcept_message_stream_observability"
     setup:
       commands:
-        - ["python3", "-m", "venv", "../.venv"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "flowcept[extras,academy] @ git+https://github.com/valescamoura/flowcept@academy_plugin"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
-        - ["../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras,academy] @ git+https://github.com/valescamoura/flowcept@academy_plugin"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "parsl[monitoring]==2026.04.27"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
     env:
       PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}"
       # Avoids macOS Objective-C fork-safety crashes when Parsl spawns Python workers.
       OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+
+  message_stream_observability_perceptron_gridsearch:
+    enabled: false
+    description: "Academy Perceptron GridSearch observed externally from Academy Redis/message stream."
+    cwd: "approaches/message_stream_observability/src/perceptron_gridsearch"
+    python: "../../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_message_stream_perceptron_gridsearch"
+    artifacts:
+      - "perceptron_gridsearch_summary.json"
+      - "artifacts"
+    flowcept:
+      telemetry_capture:
+        cpu: true
+        per_cpu: true
+        process_info: true
+        mem: true
+        disk: true
+        network: true
+        machine_info: true
+        gpu: null
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras,academy,webservice] @ git+https://github.com/valescamoura/flowcept@academy_plugin"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "numpy", "torch>=2.6.0"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "git+https://github.com/academy-agents/academy@1c9dd5bbe030e562101a30dd4dfa1b5b0dffff4d"]
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}{pathsep}{approach_cwd}{pathsep}{approach_venv_site_packages}"
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+
+  opentelemetry_integration_perceptron_gridsearch:
+    enabled: false
+    description: "Academy Perceptron GridSearch instrumented with OpenInference and exported through OpenTelemetry."
+    cwd: "approaches/opentelemetry_integration/src/perceptron_gridsearch"
+    python: "../../.venv/bin/python"
+    command: ["{python}", "main.py"]
+    uses_flowcept: true
+    mongo_db: "flowcept_opentelemetry_perceptron_gridsearch"
+    artifacts:
+      - "perceptron_gridsearch_summary.json"
+      - "artifacts"
+    flowcept:
+      telemetry_capture:
+        cpu: true
+        per_cpu: true
+        process_info: true
+        mem: true
+        disk: true
+        network: true
+        machine_info: true
+        gpu: null
+    setup:
+      commands:
+        - ["python3", "-m", "venv", "../../.venv"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "-U", "pip"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "flowcept[extras,webservice] @ git+https://github.com/ORNL/flowcept@fc_ui"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "numpy", "torch>=2.6.0", "psutil"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "academy-py @ git+https://github.com/valescamoura/academy@openinference_instrumentation"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "opentelemetry-sdk", "opentelemetry-exporter-otlp-proto-grpc"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "openinference-instrumentation @ git+https://github.com/valescamoura/openinference.git@academy#subdirectory=python/openinference-instrumentation"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "openinference-semantic-conventions @ git+https://github.com/valescamoura/openinference.git@academy#subdirectory=python/openinference-semantic-conventions"]
+        - ["../../.venv/bin/python", "-m", "pip", "install", "openinference-instrumentation-academy @ git+https://github.com/valescamoura/openinference.git@academy#subdirectory=python/instrumentation/openinference-instrumentation-academy"]
+    env:
+      PYTHONPATH: "{repo_root}/experiments/shims/no_setproctitle{pathsep}{repo_root}{pathsep}{approach_cwd}{pathsep}{approach_venv_site_packages}"
+      OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "127.0.0.1:14317"
+      OTEL_EXPORTER_OTLP_INSECURE: "true"
+      OTEL_SERVICE_NAME: "academy-openinference-perceptron-gridsearch"
+      FLOWCEPT_CAMPAIGN_ID: "academy-openinference-perceptron-gridsearch"
+      ACADEMY_FLOWCEPT_ENABLED: "0"
+      OTEL_COLLECTOR_GIT_URL: "https://github.com/valescamoura/opentelemetry-collector.git"
+      OTEL_COLLECTOR_GIT_BRANCH: "flowcept_academy_exporter"

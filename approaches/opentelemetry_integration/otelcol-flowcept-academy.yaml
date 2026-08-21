@@ -1,0 +1,26 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 127.0.0.1:14317
+      http:
+        endpoint: 127.0.0.1:14318
+
+exporters:
+  debug:
+    verbosity: detailed
+  flowceptacademy:
+    redis_addr: 127.0.0.1:6379
+    redis_db: 0
+    channel: interception
+    adapter_id: otel-openinference-academy
+    campaign_id: academy-openinference-fibonacci
+
+service:
+  telemetry:
+    metrics:
+      level: none
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [debug, flowceptacademy]

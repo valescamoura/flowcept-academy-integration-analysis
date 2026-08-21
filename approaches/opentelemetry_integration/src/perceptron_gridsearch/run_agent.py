@@ -1,0 +1,93 @@
+from __future__ import annotations
+
+import argparse
+import asyncio
+import logging
+import os
+import sys
+
+
+def _ensure_project_on_pythonpath() -> None:
+    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+    current = os.environ.get("PYTHONPATH", "")
+    paths = [path for path in current.split(os.pathsep) if path]
+    if project_dir not in paths:
+        os.environ["PYTHONPATH"] = os.pathsep.join([project_dir] + paths)
+    if project_dir not in sys.path:
+        sys.path.insert(0, project_dir)
+
+
+_ensure_project_on_pythonpath()
+
+from academy.exchange import RedisExchangeFactory
+from academy.exchange.redis import RedisAgentRegistration
+from academy.handle import Handle
+from academy.identifier import AgentId
+from academy.logging.helpers import log_context
+from academy.runtime import Runtime
+
+from approaches.opentelemetry_integration.src.perceptron_gridsearch.otel import (
+    configure_openinference,
+    shutdown_openinference,
+)
+from use_cases.perceptron_gridsearch.academy_agents import (
+    EvaluatorAgent,
+    OrchestratorAgent,
+    TrainingWorkerAgent,
+)
+
+
+logger = logging.getLogger(__name__)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Run one OpenTelemetry Academy Perceptron GridSearch agent process.")
+    parser.add_argument("--role", choices=["training_worker", "evaluator", "orchestrator"], required=True)
+    parser.add_argument("--registration-json", required=True)
+    parser.add_argument("--training-worker-id-json")
+    parser.add_argument("--evaluator-id-json")
+    return parser.parse_args()
+
+
+def build_agent(args):
+    if args.role == "training_worker":
+        return TrainingWorkerAgent()
+    if args.role == "evaluator":
+        return EvaluatorAgent()
+    if not args.training_worker_id_json or not args.evaluator_id_json:
+        raise ValueError("orchestrator requires --training-worker-id-json and --evaluator-id-json")
+    training_worker = Handle(AgentId.model_validate_json(args.training_worker_id_json))
+    evaluator = Handle(AgentId.model_validate_json(args.evaluator_id_json))
+    return OrchestratorAgent(training_worker=training_worker, evaluator=evaluator)
+
+
+async def main() -> None:
+    from academy.logging.configs.console import ConsoleLogging
+
+    args = parse_args()
+    registration = RedisAgentRegistration.model_validate_json(args.registration_json)
+    provider, instrumentor = configure_openinference()
+    log_config = ConsoleLogging(level=logging.DEBUG, extra=2)
+
+    try:
+        with log_context(log_config):
+            logger.info(
+                "starting opentelemetry agent process",
+                extra={"academy.agent_id": registration.agent_id, "agent_role": args.role, "pid": os.getpid()},
+            )
+            async with Runtime(
+                build_agent(args),
+                exchange_factory=RedisExchangeFactory(hostname="localhost", port=6379),
+                registration=registration,
+            ) as runtime:
+                await runtime.wait_shutdown()
+            logger.info(
+                "stopped opentelemetry agent process",
+                extra={"academy.agent_id": registration.agent_id, "agent_role": args.role, "pid": os.getpid()},
+            )
+    finally:
+        shutdown_openinference(provider, instrumentor)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

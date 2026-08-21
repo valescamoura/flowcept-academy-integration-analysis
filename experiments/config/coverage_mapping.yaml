@@ -1,0 +1,1292 @@
+generated_from: /Users/valesca/Documents/projects/flowcept-academy-integration-playground/experiments/config/mapping.md
+generated_at: '2026-07-01T12:32:53.749210+00:00'
+notes:
+- Generated mapping used by the current coverage scripts.
+- Edit mapping.md, then rerun build_coverage_mapping.py.
+- Synthetic subtype record-presence indicators are included as pseudo-fields.
+- task.execution_metadata.stderr is conditional and does not count when no errored
+  task has stderr.
+provenance_data_categories:
+  agentic: Information describing agent behavior and coordination, including participating
+    agents, responsibilities, delegation relationships, interactions, communication
+    patterns and LLM usage.
+  domain-dataflow: Information directly related to the scientific or business problem
+    being solved, including inputs, parameters, outputs, intermediate results, artifacts,
+    and experiment metadata.
+  hardware-usage: Information describing execution behavior and infrastructure state,
+    including timing, resource consumption, hosts, nodes, runtime environments, and
+    system metrics.
+  workflow-control: Information describing workflow structure and execution history,
+    including activities, task dependencies, execution order, and execution traces.
+analytical_capabilities:
+  dataflow-provenance: Data that enable tracing inputs, parameters, intermediate results,
+    and outputs produced during execution.
+  execution-traces: Data that enable reconstructing task/activity sequence, task hierarchy,
+    dependencies, and execution paths.
+  timing: Analyzes task duration, workflow duration, timing behavior, and execution
+    delays.
+  resource-usage: Analyzes CPU, memory, disk, network, and GPU usage.
+  platform-and-repository-context: Examine hosts, nodes, runtime environments, platform
+    context and system context.
+  agentic: Identifies which human or AI agents participated, invoked actions, produced
+    outputs, delegated work, or were responsible for failures.
+questions:
+  Did failures occur in specific tasks, agents, nodes, or environments?:
+    persona: Platform Engineer
+    required_fields:
+    - task.execution_metadata.status
+    - task.identifiers.activity_id
+    - task.identifiers.agent_id
+    - task.identifiers.source_agent_id
+    - task.user_and_system_context.node_name
+    - task.user_and_system_context.hostname
+    - task.identifiers.environment_id
+    - workflow.runtime_context.environment_id
+    kpis:
+    - Failure concentration by activity
+    - failure concentration by agent
+    - failure concentration by environment
+  Did resource usage vary across nodes, hosts, or runtime environments?:
+    persona: Platform Engineer
+    required_fields:
+    - task.user_and_system_context.node_name
+    - task.user_and_system_context.hostname
+    - task.identifiers.environment_id
+    - workflow.runtime_context.machine_info
+    - workflow.runtime_context.sys_name
+    - task.telemetry_data.telemetry_at_start.cpu
+    - task.telemetry_data.telemetry_at_end.cpu
+    - task.telemetry_data.telemetry_at_start.memory
+    - task.telemetry_data.telemetry_at_end.memory
+    kpis:
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+  How did changes in inputs or parameters affect the final outputs across executions?:
+    persona: Domain Specialist
+    required_fields:
+    - workflow.identifiers.workflow_id
+    - workflow.identifiers.campaign_id
+    - workflow.inputs_outputs_repository.generated
+    - task.provenance_data.used
+    - task.provenance_data.generated
+    - task.execution_metadata.custom_metadata
+    kpis:
+    - Parameter sensitivity
+    - output variance
+    - comparable run count
+  How long did each task and workflow take to execute?:
+    persona: Platform Engineer
+    required_fields:
+    - workflow.identifiers.workflow_id
+    - task.identifiers.workflow_id
+    - task.identifiers.task_id
+    - task.identifiers.activity_id
+    - task.timing.started_at
+    - task.timing.ended_at
+    - task.timing.submitted_at
+    - task.timing.registered_at
+    kpis:
+    - Mean task duration
+    - workflow runtime
+    - queue wait time
+  How was work delegated across agents?:
+    persona: AI Engineer
+    required_fields:
+    - task.identifiers.source_agent_id
+    - task.identifiers.agent_id
+    - task.identifiers.parent_task_id
+    - task.identifiers.group_id
+    - task.identifiers.activity_id
+    - task.timing.started_at
+    - task.timing.ended_at
+    kpis:
+    - Delegation count
+    - delegation depth
+    - cross-agent handoff count
+  What inputs, parameters, and code version were used to produce this result?:
+    persona: Domain Specialist
+    required_fields:
+    - task.provenance_data.used
+    - workflow.inputs_outputs_repository.code_repository
+    - workflow.identifiers.workflow_id
+    - task.identifiers.workflow_id
+    - workflow.user_facing_metadata.custom_metadata
+    - task.execution_metadata.custom_metadata
+    kpis:
+    - Input parameter completeness
+    - code version coverage
+    - reproducibility metadata coverage
+  What messages were exchanged between agents, and how did interactions evolve over time?:
+    persona: AI Engineer
+    required_fields:
+    - task.record_type.subtype
+    - task.execution_metadata.data
+    - task.provenance_data.used
+    - task.provenance_data.generated
+    - task.identifiers.source_agent_id
+    - task.identifiers.agent_id
+    - task.identifiers.group_id
+    - task.timing.started_at
+    - task.timing.ended_at
+    kpis:
+    - Message count
+    - interaction frequency
+    - interaction latency
+  What outputs and intermediate results were generated throughout the workflow?:
+    persona: Domain Specialist
+    required_fields:
+    - workflow.inputs_outputs_repository.generated
+    - task.provenance_data.generated
+    - task.identifiers.activity_id
+    - task.identifiers.task_id
+    - task.identifiers.workflow_id
+    - task.timing.started_at
+    kpis:
+    - Output artifact count
+    - intermediate result coverage
+    - activity-level output coverage
+  Which agent invoked each action and produced each output?:
+    persona: AI Engineer
+    required_fields:
+    - task.identifiers.agent_id
+    - task.identifiers.source_agent_id
+    - task.identifiers.activity_id
+    - task.identifiers.task_id
+    - task.provenance_data.generated
+    - workflow.inputs_outputs_repository.generated
+    kpis:
+    - Actions per agent
+    - outputs per agent
+    - agent-output attribution coverage
+  Which agent was responsible for a failure?:
+    persona: AI Engineer
+    required_fields:
+    - task.identifiers.agent_id
+    - task.identifiers.source_agent_id
+    - task.execution_metadata.status
+    - task.execution_metadata.stderr
+    - task.identifiers.activity_id
+    - task.user_and_system_context.hostname
+    - task.identifiers.environment_id
+    kpis:
+    - Agent failure rate
+    - failed actions per agent
+    - failure locality
+  Which agents participated in this execution?:
+    persona: AI Engineer
+    required_fields:
+    - workflow.identifiers.agent_id
+    - task.identifiers.agent_id
+    - workflow.identifiers.workflow_id
+    - task.identifiers.workflow_id
+    - task.identifiers.activity_id
+    - task.record_type.subtype
+    kpis:
+    - Participating agent count
+    - tasks per agent
+    - agent coverage
+  Which parameter configuration produced the best result?:
+    persona: Domain Specialist
+    required_fields:
+    - workflow.inputs_outputs_repository.generated
+    - task.provenance_data.used
+    - task.provenance_data.generated
+    - task.execution_metadata.custom_metadata
+    - workflow.identifiers.campaign_id
+    kpis:
+    - Best metric value
+    - configuration ranking
+    - successful configuration rate
+  Which sequence of workflow activities led to this result?:
+    persona: Domain Specialist
+    required_fields:
+    - task.identifiers.activity_id
+    - task.identifiers.task_id
+    - task.identifiers.parent_task_id
+    - task.provenance_data.dependencies
+    - task.provenance_data.dependents
+    - task.timing.started_at
+    - task.timing.ended_at
+    kpis:
+    - Trace completeness
+    - dependency coverage
+    - critical path length
+  Which tasks consumed the most CPU, memory, disk, network, or GPU resources?:
+    persona: Platform Engineer
+    required_fields:
+    - task.identifiers.task_id
+    - task.identifiers.activity_id
+    - task.telemetry_data.telemetry_at_start.cpu
+    - task.telemetry_data.telemetry_at_end.cpu
+    - task.telemetry_data.telemetry_at_start.memory
+    - task.telemetry_data.telemetry_at_end.memory
+    - task.telemetry_data.telemetry_at_start.disk
+    - task.telemetry_data.telemetry_at_end.disk
+    - task.telemetry_data.telemetry_at_start.network
+    - task.telemetry_data.telemetry_at_end.network
+    - task.telemetry_data.telemetry_at_start.gpu
+    - task.telemetry_data.telemetry_at_end.gpu
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+  Which tasks failed, and what error messages were produced?:
+    persona: Platform Engineer
+    required_fields:
+    - task.identifiers.task_id
+    - task.identifiers.activity_id
+    - task.identifiers.workflow_id
+    - task.execution_metadata.status
+    - task.execution_metadata.stderr
+    - task.execution_metadata.stdout
+    - task.timing.started_at
+    - task.timing.ended_at
+    kpis:
+    - Failure count
+    - failure rate
+    - error message coverage
+fields:
+  agent.identifiers.agent_id:
+    provenance_data_categories:
+    - agentic
+    analytical_capabilities:
+    - agentic
+    conditional: null
+    notes: ''
+  agent.identifiers.campaign_id:
+    provenance_data_categories:
+    - agentic
+    - workflow-control
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+  agent.identifiers.workflow_id:
+    provenance_data_categories:
+    - agentic
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: null
+    notes: ''
+  agent.record_type.type:
+    provenance_data_categories:
+    - agentic
+    analytical_capabilities:
+    - agentic
+    conditional: null
+    notes: ''
+  agent.runtime_context.user:
+    provenance_data_categories:
+    - agentic
+    - workflow-control
+    analytical_capabilities:
+    - agentic
+    conditional: null
+    notes: ''
+  agent.timing.registered_at:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - timing
+    conditional: null
+    notes: ''
+  agent.user_facing_metadata.name:
+    provenance_data_categories:
+    - agentic
+    analytical_capabilities:
+    - agentic
+    conditional: null
+    notes: ''
+  task.execution_metadata.custom_metadata:
+    provenance_data_categories:
+    - domain-dataflow
+    analytical_capabilities:
+    - dataflow-provenance
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    questions:
+    - What inputs, parameters, and code version were used to produce this result?
+    - How did changes in inputs or parameters affect the final outputs across executions?
+    - Which parameter configuration produced the best result?
+    kpis:
+    - Input parameter completeness
+    - code version coverage
+    - reproducibility metadata coverage
+    - Parameter sensitivity
+    - output variance
+    - comparable run count
+    - Best metric value
+    - configuration ranking
+    - successful configuration rate
+  task.execution_metadata.data:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - AI Engineer
+    questions:
+    - What messages were exchanged between agents, and how did interactions evolve
+      over time?
+    kpis:
+    - Message count
+    - interaction frequency
+    - interaction latency
+  task.execution_metadata.status:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - Which tasks failed, and what error messages were produced?
+    - Did failures occur in specific tasks, agents, nodes, or environments?
+    - Which agent was responsible for a failure?
+    kpis:
+    - Failure count
+    - failure rate
+    - error message coverage
+    - Failure concentration by activity
+    - failure concentration by agent
+    - failure concentration by environment
+    - Agent failure rate
+    - failed actions per agent
+    - failure locality
+  task.execution_metadata.stderr:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: requires_error_stderr
+    notes: Included in the denominator only for approaches that produced at least
+      one errored task with non-empty stderr.
+    personas:
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - Which tasks failed, and what error messages were produced?
+    - Which agent was responsible for a failure?
+    kpis:
+    - Failure count
+    - failure rate
+    - error message coverage
+    - Agent failure rate
+    - failed actions per agent
+    - failure locality
+  task.execution_metadata.stdout:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks failed, and what error messages were produced?
+    kpis:
+    - Failure count
+    - failure rate
+    - error message coverage
+  task.identifiers.activity_id:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - What outputs and intermediate results were generated throughout the workflow?
+    - Which sequence of workflow activities led to this result?
+    - How long did each task and workflow take to execute?
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    - Which tasks failed, and what error messages were produced?
+    - Did failures occur in specific tasks, agents, nodes, or environments?
+    - Which agents participated in this execution?
+    - Which agent invoked each action and produced each output?
+    - How was work delegated across agents?
+    - Which agent was responsible for a failure?
+    kpis:
+    - Output artifact count
+    - intermediate result coverage
+    - activity-level output coverage
+    - Trace completeness
+    - dependency coverage
+    - critical path length
+    - Mean task duration
+    - workflow runtime
+    - queue wait time
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+    - Failure count
+    - failure rate
+    - error message coverage
+    - Failure concentration by activity
+    - failure concentration by agent
+    - failure concentration by environment
+    - Participating agent count
+    - tasks per agent
+    - agent coverage
+    - Actions per agent
+    - outputs per agent
+    - agent-output attribution coverage
+    - Delegation count
+    - delegation depth
+    - cross-agent handoff count
+    - Agent failure rate
+    - failed actions per agent
+    - failure locality
+  task.identifiers.agent_id:
+    provenance_data_categories:
+    - agentic
+    analytical_capabilities:
+    - agentic
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - Did failures occur in specific tasks, agents, nodes, or environments?
+    - Which agents participated in this execution?
+    - Which agent invoked each action and produced each output?
+    - How was work delegated across agents?
+    - What messages were exchanged between agents, and how did interactions evolve
+      over time?
+    - Which agent was responsible for a failure?
+    kpis:
+    - Failure concentration by activity
+    - failure concentration by agent
+    - failure concentration by environment
+    - Participating agent count
+    - tasks per agent
+    - agent coverage
+    - Actions per agent
+    - outputs per agent
+    - agent-output attribution coverage
+    - Delegation count
+    - delegation depth
+    - cross-agent handoff count
+    - Message count
+    - interaction frequency
+    - interaction latency
+    - Agent failure rate
+    - failed actions per agent
+    - failure locality
+  task.identifiers.campaign_id:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+  task.identifiers.environment_id:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - Did failures occur in specific tasks, agents, nodes, or environments?
+    - Did resource usage vary across nodes, hosts, or runtime environments?
+    - Which agent was responsible for a failure?
+    kpis:
+    - Failure concentration by activity
+    - failure concentration by agent
+    - failure concentration by environment
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+    - Agent failure rate
+    - failed actions per agent
+    - failure locality
+  task.identifiers.group_id:
+    provenance_data_categories:
+    - agentic
+    analytical_capabilities:
+    - agentic
+    conditional: null
+    notes: ''
+    personas:
+    - AI Engineer
+    questions:
+    - How was work delegated across agents?
+    - What messages were exchanged between agents, and how did interactions evolve
+      over time?
+    kpis:
+    - Delegation count
+    - delegation depth
+    - cross-agent handoff count
+    - Message count
+    - interaction frequency
+    - interaction latency
+  task.identifiers.parent_task_id:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - AI Engineer
+    questions:
+    - Which sequence of workflow activities led to this result?
+    - How was work delegated across agents?
+    kpis:
+    - Trace completeness
+    - dependency coverage
+    - critical path length
+    - Delegation count
+    - delegation depth
+    - cross-agent handoff count
+  task.identifiers.source_agent_id:
+    provenance_data_categories:
+    - agentic
+    analytical_capabilities:
+    - agentic
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - Did failures occur in specific tasks, agents, nodes, or environments?
+    - Which agent invoked each action and produced each output?
+    - How was work delegated across agents?
+    - What messages were exchanged between agents, and how did interactions evolve
+      over time?
+    - Which agent was responsible for a failure?
+    kpis:
+    - Failure concentration by activity
+    - failure concentration by agent
+    - failure concentration by environment
+    - Actions per agent
+    - outputs per agent
+    - agent-output attribution coverage
+    - Delegation count
+    - delegation depth
+    - cross-agent handoff count
+    - Message count
+    - interaction frequency
+    - interaction latency
+    - Agent failure rate
+    - failed actions per agent
+    - failure locality
+  task.identifiers.task_id:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - What outputs and intermediate results were generated throughout the workflow?
+    - Which sequence of workflow activities led to this result?
+    - How long did each task and workflow take to execute?
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    - Which tasks failed, and what error messages were produced?
+    - Which agent invoked each action and produced each output?
+    kpis:
+    - Output artifact count
+    - intermediate result coverage
+    - activity-level output coverage
+    - Trace completeness
+    - dependency coverage
+    - critical path length
+    - Mean task duration
+    - workflow runtime
+    - queue wait time
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+    - Failure count
+    - failure rate
+    - error message coverage
+    - Actions per agent
+    - outputs per agent
+    - agent-output attribution coverage
+  task.identifiers.workflow_id:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - What inputs, parameters, and code version were used to produce this result?
+    - What outputs and intermediate results were generated throughout the workflow?
+    - How long did each task and workflow take to execute?
+    - Which tasks failed, and what error messages were produced?
+    - Which agents participated in this execution?
+    kpis:
+    - Input parameter completeness
+    - code version coverage
+    - reproducibility metadata coverage
+    - Output artifact count
+    - intermediate result coverage
+    - activity-level output coverage
+    - Mean task duration
+    - workflow runtime
+    - queue wait time
+    - Failure count
+    - failure rate
+    - error message coverage
+    - Participating agent count
+    - tasks per agent
+    - agent coverage
+  task.provenance_data.dependencies:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    questions:
+    - Which sequence of workflow activities led to this result?
+    kpis:
+    - Trace completeness
+    - dependency coverage
+    - critical path length
+  task.provenance_data.dependents:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    questions:
+    - Which sequence of workflow activities led to this result?
+    kpis:
+    - Trace completeness
+    - dependency coverage
+    - critical path length
+  task.provenance_data.generated:
+    provenance_data_categories:
+    - domain-dataflow
+    analytical_capabilities:
+    - dataflow-provenance
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - AI Engineer
+    questions:
+    - What outputs and intermediate results were generated throughout the workflow?
+    - How did changes in inputs or parameters affect the final outputs across executions?
+    - Which parameter configuration produced the best result?
+    - Which agent invoked each action and produced each output?
+    - What messages were exchanged between agents, and how did interactions evolve
+      over time?
+    kpis:
+    - Output artifact count
+    - intermediate result coverage
+    - activity-level output coverage
+    - Parameter sensitivity
+    - output variance
+    - comparable run count
+    - Best metric value
+    - configuration ranking
+    - successful configuration rate
+    - Actions per agent
+    - outputs per agent
+    - agent-output attribution coverage
+    - Message count
+    - interaction frequency
+    - interaction latency
+  task.provenance_data.used:
+    provenance_data_categories:
+    - domain-dataflow
+    analytical_capabilities:
+    - dataflow-provenance
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - AI Engineer
+    questions:
+    - What inputs, parameters, and code version were used to produce this result?
+    - How did changes in inputs or parameters affect the final outputs across executions?
+    - Which parameter configuration produced the best result?
+    - What messages were exchanged between agents, and how did interactions evolve
+      over time?
+    kpis:
+    - Input parameter completeness
+    - code version coverage
+    - reproducibility metadata coverage
+    - Parameter sensitivity
+    - output variance
+    - comparable run count
+    - Best metric value
+    - configuration ranking
+    - successful configuration rate
+    - Message count
+    - interaction frequency
+    - interaction latency
+  task.record_type.subtype:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: null
+    notes: ''
+    personas:
+    - AI Engineer
+    questions:
+    - Which agents participated in this execution?
+    - What messages were exchanged between agents, and how did interactions evolve
+      over time?
+    kpis:
+    - Participating agent count
+    - tasks per agent
+    - agent coverage
+    - Message count
+    - interaction frequency
+    - interaction latency
+  task.record_type.subtype.academy_lifecycle:
+    provenance_data_categories:
+    - agentic
+    analytical_capabilities:
+    - agentic
+    conditional: null
+    notes: Synthetic record-presence indicator. Counted when at least one task has
+      subtype='academy_lifecycle'.
+  task.record_type.subtype.agent_communication:
+    provenance_data_categories:
+    - agentic
+    analytical_capabilities:
+    - agentic
+    conditional: null
+    notes: Synthetic record-presence indicator. Counted when at least one task has
+      subtype='agent_communication'.
+  task.telemetry_data.telemetry_at_end.cpu:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    - Did resource usage vary across nodes, hosts, or runtime environments?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+  task.telemetry_data.telemetry_at_end.disk:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+  task.telemetry_data.telemetry_at_end.gpu:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+  task.telemetry_data.telemetry_at_end.memory:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    - Did resource usage vary across nodes, hosts, or runtime environments?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+  task.telemetry_data.telemetry_at_end.network:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+  task.telemetry_data.telemetry_at_end.process:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+  task.telemetry_data.telemetry_at_start.cpu:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    - Did resource usage vary across nodes, hosts, or runtime environments?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+  task.telemetry_data.telemetry_at_start.disk:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+  task.telemetry_data.telemetry_at_start.gpu:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+  task.telemetry_data.telemetry_at_start.memory:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    - Did resource usage vary across nodes, hosts, or runtime environments?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+  task.telemetry_data.telemetry_at_start.network:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Which tasks consumed the most CPU, memory, disk, network, or GPU resources?
+    kpis:
+    - Peak CPU usage
+    - peak memory usage
+    - disk/network/GPU utilization
+  task.telemetry_data.telemetry_at_start.process:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    conditional: null
+    notes: ''
+  task.timing.ended_at:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - timing
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - Which sequence of workflow activities led to this result?
+    - How long did each task and workflow take to execute?
+    - Which tasks failed, and what error messages were produced?
+    - How was work delegated across agents?
+    - What messages were exchanged between agents, and how did interactions evolve
+      over time?
+    kpis:
+    - Trace completeness
+    - dependency coverage
+    - critical path length
+    - Mean task duration
+    - workflow runtime
+    - queue wait time
+    - Failure count
+    - failure rate
+    - error message coverage
+    - Delegation count
+    - delegation depth
+    - cross-agent handoff count
+    - Message count
+    - interaction frequency
+    - interaction latency
+  task.timing.registered_at:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - timing
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - How long did each task and workflow take to execute?
+    kpis:
+    - Mean task duration
+    - workflow runtime
+    - queue wait time
+  task.timing.started_at:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - timing
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - What outputs and intermediate results were generated throughout the workflow?
+    - Which sequence of workflow activities led to this result?
+    - How long did each task and workflow take to execute?
+    - Which tasks failed, and what error messages were produced?
+    - How was work delegated across agents?
+    - What messages were exchanged between agents, and how did interactions evolve
+      over time?
+    kpis:
+    - Output artifact count
+    - intermediate result coverage
+    - activity-level output coverage
+    - Trace completeness
+    - dependency coverage
+    - critical path length
+    - Mean task duration
+    - workflow runtime
+    - queue wait time
+    - Failure count
+    - failure rate
+    - error message coverage
+    - Delegation count
+    - delegation depth
+    - cross-agent handoff count
+    - Message count
+    - interaction frequency
+    - interaction latency
+  task.timing.submitted_at:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - How long did each task and workflow take to execute?
+    kpis:
+    - Mean task duration
+    - workflow runtime
+    - queue wait time
+  task.user_and_system_context.hostname:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    - platform-and-repository-context
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - Did failures occur in specific tasks, agents, nodes, or environments?
+    - Did resource usage vary across nodes, hosts, or runtime environments?
+    - Which agent was responsible for a failure?
+    kpis:
+    - Failure concentration by activity
+    - failure concentration by agent
+    - failure concentration by environment
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+    - Agent failure rate
+    - failed actions per agent
+    - failure locality
+  task.user_and_system_context.login_name:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - platform-and-repository-context
+    conditional: null
+    notes: ''
+  task.user_and_system_context.node_name:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - resource-usage
+    - platform-and-repository-context
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Did failures occur in specific tasks, agents, nodes, or environments?
+    - Did resource usage vary across nodes, hosts, or runtime environments?
+    kpis:
+    - Failure concentration by activity
+    - failure concentration by agent
+    - failure concentration by environment
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+  workflow.identifiers.agent_id:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - AI Engineer
+    questions:
+    - Which agents participated in this execution?
+    kpis:
+    - Participating agent count
+    - tasks per agent
+    - agent coverage
+  workflow.identifiers.campaign_id:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    questions:
+    - How did changes in inputs or parameters affect the final outputs across executions?
+    - Which parameter configuration produced the best result?
+    kpis:
+    - Parameter sensitivity
+    - output variance
+    - comparable run count
+    - Best metric value
+    - configuration ranking
+    - successful configuration rate
+  workflow.identifiers.workflow_id:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - Platform Engineer
+    - AI Engineer
+    questions:
+    - What inputs, parameters, and code version were used to produce this result?
+    - How did changes in inputs or parameters affect the final outputs across executions?
+    - How long did each task and workflow take to execute?
+    - Which agents participated in this execution?
+    kpis:
+    - Input parameter completeness
+    - code version coverage
+    - reproducibility metadata coverage
+    - Parameter sensitivity
+    - output variance
+    - comparable run count
+    - Mean task duration
+    - workflow runtime
+    - queue wait time
+    - Participating agent count
+    - tasks per agent
+    - agent coverage
+  workflow.inputs_outputs_repository.code_repository:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - platform-and-repository-context
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    questions:
+    - What inputs, parameters, and code version were used to produce this result?
+    kpis:
+    - Input parameter completeness
+    - code version coverage
+    - reproducibility metadata coverage
+  workflow.inputs_outputs_repository.generated:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    - AI Engineer
+    questions:
+    - What outputs and intermediate results were generated throughout the workflow?
+    - How did changes in inputs or parameters affect the final outputs across executions?
+    - Which parameter configuration produced the best result?
+    - Which agent invoked each action and produced each output?
+    kpis:
+    - Output artifact count
+    - intermediate result coverage
+    - activity-level output coverage
+    - Parameter sensitivity
+    - output variance
+    - comparable run count
+    - Best metric value
+    - configuration ranking
+    - successful configuration rate
+    - Actions per agent
+    - outputs per agent
+    - agent-output attribution coverage
+  workflow.runtime_context.environment_id:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Did failures occur in specific tasks, agents, nodes, or environments?
+    kpis:
+    - Failure concentration by activity
+    - failure concentration by agent
+    - failure concentration by environment
+  workflow.runtime_context.machine_info:
+    provenance_data_categories:
+    - hardware-usage
+    analytical_capabilities:
+    - platform-and-repository-context
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Did resource usage vary across nodes, hosts, or runtime environments?
+    kpis:
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+  workflow.runtime_context.sys_name:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - platform-and-repository-context
+    conditional: null
+    notes: ''
+    personas:
+    - Platform Engineer
+    questions:
+    - Did resource usage vary across nodes, hosts, or runtime environments?
+    kpis:
+    - Resource variance by host
+    - environment-level performance spread
+    - hardware utilization imbalance
+  workflow.runtime_context.user:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - platform-and-repository-context
+    conditional: null
+    notes: ''
+  workflow.runtime_context.utc_timestamp:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - timing
+    conditional: null
+    notes: ''
+  workflow.user_facing_metadata.custom_metadata:
+    provenance_data_categories: []
+    analytical_capabilities: []
+    conditional: null
+    notes: ''
+    personas:
+    - Domain Specialist
+    questions:
+    - What inputs, parameters, and code version were used to produce this result?
+    kpis:
+    - Input parameter completeness
+    - code version coverage
+    - reproducibility metadata coverage
+  workflow.user_facing_metadata.name:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: null
+    notes: ''
+  workflow.user_facing_metadata.subtype:
+    provenance_data_categories:
+    - workflow-control
+    analytical_capabilities:
+    - execution-traces
+    conditional: null
+    notes: ''
+custom_fields: {}

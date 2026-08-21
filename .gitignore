@@ -224,6 +224,10 @@ experiments/results/*
 # use cases
 */*/src/runinfo
 approaches/dynamic_runtime_instrumentation/src/academy_plugin_perf.csv
+*.pt
+*perceptron_gridsearch_summary.json
 
 # test
 flowcept_test/
+*.DS_Store
+experiments_old

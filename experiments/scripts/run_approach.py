@@ -273,7 +273,8 @@ def run_one(
         new_workflows = sorted(after_workflows - before_workflows)
         new_tasks = sorted(after_tasks - before_tasks)
 
-        for artifact in ["flowcept_buffer.jsonl", "PROVENANCE_CARD.md", "workflow_card.md"]:
+        default_artifacts = ["flowcept_buffer.jsonl", "PROVENANCE_CARD.md", "workflow_card.md"]
+        for artifact in [*default_artifacts, *approach.get("artifacts", [])]:
             copy_if_exists(cwd / artifact, run_dir / artifact)
 
         metadata = {
