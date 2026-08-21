@@ -1,37 +1,80 @@
-## Dynamic Runtime Instrumentation
+# Dynamic Runtime Instrumentation
 
-This approach uses the `agentic` branch of
-`GueroudjiAmal/flowcept`, which provides an Academy plugin that monkey-patches
-`academy.runtime.Runtime` at runtime.
+Paper label: **Dynamic Framework Instrumentation**
 
-The Fibonacci use case code is intentionally close to the baseline. The capture
-logic is not embedded in `fibiterate7.py`; it is enabled through Flowcept's
-settings:
+This approach enables Flowcept capture through a runtime Academy plugin. The
+application code stays close to the baseline; instrumentation is activated from
+Flowcept settings.
+
+Implementation:
+
+```text
+approaches/dynamic_runtime_instrumentation/src/perceptron_gridsearch
+```
+
+Configured experiment name:
+
+```text
+dynamic_runtime_instrumentation_perceptron_gridsearch
+```
+
+Configured MongoDB name:
+
+```text
+flowcept_dynamic_runtime_instrumentation_perceptron_gridsearch
+```
+
+Generated Flowcept settings:
+
+```text
+experiments/results/dynamic_runtime_instrumentation_perceptron_gridsearch/flowcept_settings.yaml
+```
+
+## Instrumentation and Configuration
+
+Instrumentation is activated by Flowcept's runtime Academy plugin, not by edits
+inside the application workflow. The setup installs the Flowcept implementation
+that provides this plugin:
+
+```text
+https://github.com/GueroudjiAmal/flowcept@merge-fc-ui-into-agentic
+```
+
+The generated settings include the Academy plugin block:
 
 ```yaml
 plugins:
   academy:
     enabled: true
     kind: academy
-    workflow_name: academy_fibonacci_dynamic_runtime_instrumentation
-    performance_tracking: true
 ```
 
-Expected behavior:
+The run script generates this YAML from `experiments/config/approaches.yaml`.
+Advanced users can edit either file to change the plugin, MongoDB, Redis, or
+telemetry configuration.
 
-- Flowcept starts normally from the driver script.
-- The Academy plugin starts automatically from `settings.yaml`.
-- The plugin patches Academy runtime methods.
-- Academy action, loop, and lifecycle events are emitted as Flowcept tasks.
+## Run
 
-The upstream example for this plugin uses `LocalExchangeFactory` and
-`ThreadPoolExecutor`. This approach follows that execution model because the
-plugin patches Academy's in-process `Runtime` class. With the common
-`RedisExchangeFactory` + `ParslPoolExecutor` setup, the agent runtime executes
-inside Parsl worker processes where the plugin's active interceptor is not
-propagated by this Flowcept branch, so workflows are created but action tasks
-are not captured.
+Run from the repository root. MongoDB and Redis should already be running.
 
-This is an important evaluation boundary for the approach: the monkey-patching
-implementation is effective for in-process Academy runtimes, but it is not
-currently Parsl-aware.
+```bash
+.venv/bin/python experiments/scripts/setup_approach.py \
+  --approach dynamic_runtime_instrumentation_perceptron_gridsearch \
+  --force
+
+.venv/bin/python experiments/scripts/run_approach.py \
+  --approach dynamic_runtime_instrumentation_perceptron_gridsearch \
+  --runs 3 \
+  --clean-db
+```
+
+## UI
+
+```bash
+.venv/bin/python experiments/scripts/start_approach_ui.py \
+  --approach dynamic_runtime_instrumentation_perceptron_gridsearch
+```
+
+The script prints the UI URL, MongoDB database, and settings path. Advanced
+Flowcept users can edit the generated settings YAML or
+`experiments/config/approaches.yaml`.
